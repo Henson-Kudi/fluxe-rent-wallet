@@ -1,17 +1,14 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, ExternalLink } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 
 interface TestTokensProps {
   address: string
 }
 
 export default function TestTokens({ address }: TestTokensProps) {
-  const [error, setError] = useState<string | null>(null)
 
   const openNileFaucet = () => {
     window.open("https://nileex.io/join/getJoinPage", "_blank")
@@ -34,13 +31,6 @@ export default function TestTokens({ address }: TestTokensProps) {
             </ol>
           </p>
         </div>
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         <div className="flex flex-col space-y-2">
           <Button onClick={openNileFaucet} className="w-full flex items-center justify-center gap-2">

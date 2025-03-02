@@ -65,7 +65,7 @@ export default function VerifyMnemonic({ mnemonic, onVerificationSuccess }: Veri
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">Verify Your Mnemonic</CardTitle>
         <CardDescription className="text-center">
-          Select the words in the correct order to verify you've saved your mnemonic phrase
+          Select the words in the correct order to verify you&apos;ve saved your mnemonic phrase
         </CardDescription>
       </CardHeader>
 

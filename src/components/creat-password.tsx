@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback } from "react"
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,10 +31,6 @@ export default function CreatePassword({ mnemonic, onPasswordCreated }: CreatePa
       hasSpecialChar: /[^A-Za-z0-9]/.test(pass),
     }
   }, [])
-
-//   useEffect(()=>{
-//     setIsProcessing(false)
-//   },[])
 
   const passwordChecks = validatePassword(password)
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean)

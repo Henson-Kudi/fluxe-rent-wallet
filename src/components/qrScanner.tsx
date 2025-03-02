@@ -66,7 +66,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
     <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
       <CardHeader className="text-center space-y-1">
         <CardTitle className="text-2xl font-bold">Scan Mnemonic QR Code</CardTitle>
-        <CardDescription>Scan the QR code containing your wallet's mnemonic phrase</CardDescription>
+        <CardDescription>Scan the QR code containing your wallet&apos;s mnemonic phrase</CardDescription>
       </CardHeader>
       <CardContent>
         {isInitializing ? (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
-import { createWalletFromMnemonic, getExplorerUrl, getTRC20Balance, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
+import { createWalletFromMnemonic, getExplorerUrl, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
 import type { WalletInfo } from "./wallet-setup"
 import WalletInfoCard from "./wallet-info"
 import TransferForm from "./transfer-form"
@@ -20,9 +20,10 @@ interface WalletDetailsProps {
 
 
 
-export default function WalletDetails({ encryptedMnemonic, mnemonic }: WalletDetailsProps) {
+export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [transferResult, setTransferResult] = useState<any>(null)
 
   useEffect(() => {

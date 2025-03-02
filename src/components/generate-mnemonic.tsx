@@ -85,7 +85,7 @@ export default function GenerateMnemonic({ onMnemonicGenerated }: GenerateMnemon
 
             <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg w-full">
               <p className="text-sm text-amber-800">
-                <strong>Important:</strong> Save this mnemonic phrase securely. It's the only way to recover your
+                <strong>Important:</strong> Save this mnemonic phrase securely. It&apos;s the only way to recover your
                 wallet. Never share it with anyone.
               </p>
             </div>

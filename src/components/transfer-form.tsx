@@ -14,10 +14,10 @@ import { isValidTronAddress } from "@/lib/tron-utils"
 
 interface TransferFormProps {
   fromAddress: string
-  onTransfer: (toAddress: string, amount: number, tokenType: "TRX" | "USDT") => Promise<any>
+  onTransfer: (toAddress: string, amount: number, tokenType: "TRX" | "USDT") => Promise<unknown>
 }
 
-export default function TransferForm({ fromAddress, onTransfer }: TransferFormProps) {
+export default function TransferForm({ onTransfer }: TransferFormProps) {
   const [toAddress, setToAddress] = useState("")
   const [amount, setAmount] = useState("")
   const [tokenType, setTokenType] = useState<"TRX" | "USDT">("TRX")
@@ -50,14 +50,13 @@ export default function TransferForm({ fromAddress, onTransfer }: TransferFormPr
     setIsLoading(true)
 
     try {
-      const result = await onTransfer(toAddress, amountValue, tokenType)
+      await onTransfer(toAddress, amountValue, tokenType)
       setSuccess(`Successfully sent ${amount} ${tokenType} to ${toAddress.substring(0, 8)}...`)
-      console.log(result, 'transfer result')
       // Reset form
       setToAddress("")
       setAmount("")
-    } catch (err: any) {
-      setError(err.message || "Transaction failed. Please try again.")
+    } catch (err) {
+      setError((err as Error)?.message || "Transaction failed. Please try again.")
     } finally {
       setIsLoading(false)
     }

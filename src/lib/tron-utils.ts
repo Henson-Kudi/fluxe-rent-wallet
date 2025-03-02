@@ -30,7 +30,7 @@ function generateEntropy(length = 16): Uint8Array {
  */
 export function generateMnemonic(): string {
     const entropy = generateEntropy()
-    console.log(entropy, 'entropy')
+
     return bip39.entropyToMnemonic(entropy as Buffer<ArrayBufferLike>)
 }
 
@@ -67,7 +67,7 @@ export async function createWalletFromMnemonic(mnemonic: string): Promise<Wallet
 
     try {
         // Generate private key from mnemonic
-        const seed = await bip39.mnemonicToSeed(mnemonic)
+        await bip39.mnemonicToSeed(mnemonic)
 
         // Create account from private key
         const account = await tronWeb.createAccount()
@@ -138,7 +138,7 @@ export async function isValidTronAddress(address: string): Promise<boolean> {
 /**
  * Request test tokens from Shasta testnet faucet
  */
-export async function requestTestTokens(address: string): Promise<void> {
+export async function requestTestTokens(): Promise<void> {
     try {
         window.open(NILE_FAUCET_URL, "_blank")
 
@@ -158,7 +158,7 @@ export async function sendTRX(
     toAddress: string,
     amount: number,
     privateKey: string,
-): Promise<any> {
+): Promise<unknown> {
     const tronWeb = await initTronWeb()
     if (!tronWeb) throw new Error("TronWeb not initialized")
 
@@ -190,7 +190,7 @@ export async function sendTRC20(
     toAddress: string,
     amount: number,
     privateKey: string,
-): Promise<any> {
+): Promise<unknown> {
     const tronWeb = await initTronWeb()
     if (!tronWeb) throw new Error("TronWeb not initialized")
 
