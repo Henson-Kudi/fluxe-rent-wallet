@@ -240,6 +240,46 @@ export async function getTRC20Balance(address: string, contractAddress: string =
         throw new Error("Failed to fetch TRC20 balance")
     }
 }
+/**
+ * Get Transaction history of an address
+ * @param walletAddress string
+ * @returns 
+ */
+export const fetchTransactions = async (walletAddress: string) => {
+
+
+    try {
+        // Fetch both TRX and TRC20 transactions
+        const response = await fetch(
+            `https://nile.trongrid.io/v1/accounts/${walletAddress}/transactions?limit=50&only_confirmed=true`,
+            {
+                headers: {
+                    "TRON-PRO-API-KEY": process.env.NEXT_PUBLIC_TRONGRID_API_KEY || "",
+                },
+            },
+        )
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch transactions")
+        }
+
+        const data = await response.json()
+        const formattedTransactions = data.data.map((tx: any) => ({
+            txID: tx.txID,
+            timestamp: tx.block_timestamp,
+            ownerAddress: tx.raw_data.contract[0].parameter.value.owner_address,
+            toAddress: tx.raw_data.contract[0].parameter.value.to_address,
+            amount: new BigNumber(tx.raw_data.contract[0].parameter.value.amount || 0).dividedBy(1e6).toNumber(),
+            confirmed: tx.ret[0].contractRet === "SUCCESS",
+            contractData: tx.raw_data.contract[0].parameter.value,
+        }))
+
+        return formattedTransactions
+    } catch (err) {
+        throw err
+        
+    }
+}
 
 /**
  * Get explorer URL for an address or transaction

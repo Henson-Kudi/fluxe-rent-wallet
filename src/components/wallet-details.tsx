@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
-import { createWalletFromMnemonic, getExplorerUrl, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
+import { useState, useEffect, useCallback } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Loader2, RefreshCw } from "lucide-react"
+import { createWalletFromMnemonic, fetchTransactions, getExplorerUrl, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
 import type { WalletInfo } from "./wallet-setup"
 import WalletInfoCard from "./wallet-info"
 import TransferForm from "./transfer-form"
@@ -11,6 +11,8 @@ import TestTokens from "./test-tokens"
 import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import BigNumber from "bignumber.js"
+import { Transaction, TransactionState } from "@/lib/types"
+import TransactionHistory from "./transaction-history"
 
 interface WalletDetailsProps {
   encryptedMnemonic: string
@@ -25,11 +27,40 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
   const [isLoading, setIsLoading] = useState(true)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [transferResult, setTransferResult] = useState<any>(null)
+  const [transactionState, setTransactionState] = useState<TransactionState>({
+    data: [],
+    isLoading: true,
+    error: null,
+  })
+
+  const refreshTransactions = useCallback(async (address: string) => {
+    setTransactionState((prev) => ({ ...prev, isLoading: true, error: null }))
+
+    try {
+      const formattedTransactions = await fetchTransactions(address)
+
+      setTransactionState({
+        data: formattedTransactions,
+        isLoading: false,
+        error: null,
+      })
+    } catch (err) {
+      console.error("Error fetching transactions:", err)
+      setTransactionState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Failed to load transaction history",
+      }))
+    }
+  }, [])
 
   useEffect(() => {
     const generateWallet = async () => {
       try {
         const wallet = await createWalletFromMnemonic(mnemonic)
+
+        // Fetch initial transactions
+        await refreshTransactions(wallet.address.base58)
 
         setWalletInfo(wallet)
       } catch (error) {
@@ -40,7 +71,7 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
     }
 
     generateWallet()
-  }, [mnemonic])
+  }, [mnemonic, refreshTransactions])
 
   const handleTransfer = async (toAddress: string, amount: number, tokenType: "TRX" | "USDT") => {
     if (!walletInfo || !walletInfo.tronWeb) return
@@ -138,6 +169,22 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
           }
       }
 
+      // Add the new transaction to the list immediately
+      const newTransaction: Transaction = {
+        txID: result.txid || result.transaction.txID,
+        timestamp: Date.now(),
+        ownerAddress: walletInfo.address.hex,
+        toAddress: toAddress,
+        amount: amount,
+        confirmed: false,
+        tokenType: tokenType,
+      }
+
+      setTransactionState((prev) => ({
+        ...prev,
+        data: [newTransaction, ...prev.data],
+      }))
+
       setTransferResult(result)
       return result
     } catch (error) {
@@ -146,8 +193,10 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
     }
   }
 
-  const viewTransaction = (txId: string) => {
-    window.open(getExplorerUrl("transaction", txId), "_blank")
+  const handleRefresh = () => {
+    if (walletInfo) {
+      refreshTransactions(walletInfo.address.base58)
+    }
   }
 
   if (isLoading) {
@@ -172,13 +221,42 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
         {walletInfo && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <WalletInfoCard address={walletInfo.address.base58} />
-              <TransferForm fromAddress={walletInfo.address.base58} onTransfer={handleTransfer} />
+              <div>
+                <WalletInfoCard address={walletInfo.address.base58} />
+
+                <Card className="my-4">
+                    <CardHeader>
+                        <div className="flex items-center justify-between mb-4">
+                      <CardTitle>Transaction History</CardTitle>
+                      <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={transactionState.isLoading}>
+                        <RefreshCw className={`h-4 w-4 mr-2 ${transactionState.isLoading ? "animate-spin" : ""}`} />
+                        Refresh
+                      </Button>
+                    </div>
+                    </CardHeader>
+
+                    <CardContent>
+                        <TransactionHistory
+                          transactions={transactionState.data}
+                          isLoading={transactionState.isLoading}
+                          error={transactionState.error}
+                          walletInfo={walletInfo}
+                        />
+                    </CardContent>
+                </Card>
+              </div>
+              <div>
+                <TransferForm fromAddress={walletInfo.address.base58} onTransfer={handleTransfer} />
+                <div className="my-4">
+                    <TestTokens address={walletInfo.address.base58} />
+                </div>
+              </div>
             </div>
 
-            <TestTokens address={walletInfo.address.base58} />
+            
 
-            {transferResult && (
+
+            {/* {transferResult && (
               <Alert className="bg-green-50 border-green-200">
                 <div className="space-y-2">
                   <h3 className="font-medium text-green-800">Transaction Successful!</h3>
@@ -195,7 +273,7 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
                   </Button>
                 </div>
               </Alert>
-            )}
+            )} */}
           </>
         )}
       </CardContent>
