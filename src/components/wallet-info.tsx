@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, ExternalLink, RefreshCw } from "lucide-react"
+import { Copy, Check, ExternalLink, RefreshCw, QrCode } from "lucide-react"
 import { getTronBalance, getTRC20Balance, getExplorerUrl } from "@/lib/tron-utils"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { QRCodeSVG } from "qrcode.react"
 
 interface WalletInfoProps {
   address: string
@@ -19,6 +21,7 @@ interface BalanceState {
 }
 
 export default function WalletInfoCard({ address }: WalletInfoProps) {
+
   const [copied, setCopied] = useState(false)
   const [balanceState, setBalanceState] = useState<BalanceState>({
     trx: null,
@@ -90,9 +93,38 @@ export default function WalletInfoCard({ address }: WalletInfoProps) {
       <CardContent className="space-y-4">
         <div>
           <h3 className="text-sm font-medium mb-1">Wallet Address:</h3>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <code className="text-sm break-all font-mono bg-gray-100 p-2 rounded flex-1">{address}</code>
-            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(address)} className="ml-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" className="shrink-0">
+                  <QrCode className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Scan to Send Tokens</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col items-center justify-center p-6 space-y-4">
+                  <div className="bg-white p-4 rounded-lg">
+                    <QRCodeSVG
+                      value={address}
+                      size={200}
+                      level="H"
+                      includeMargin
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-sm font-medium">Network: Tron (Nile Testnet)</p>
+                    <p className="text-xs text-muted-foreground break-all font-mono bg-gray-100 p-2 rounded">
+                      {address}
+                    </p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(address)}>
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
