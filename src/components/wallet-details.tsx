@@ -3,12 +3,11 @@
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, RefreshCw } from "lucide-react"
-import { createWalletFromMnemonic, fetchTransactions, getExplorerUrl, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
+import { createWalletFromMnemonic, fetchTransactions, getTronBalance, NILE_USDT_CONTRACT } from "@/lib/tron-utils"
 import type { WalletInfo } from "./wallet-setup"
 import WalletInfoCard from "./wallet-info"
 import TransferForm from "./transfer-form"
 import TestTokens from "./test-tokens"
-import { Alert } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import BigNumber from "bignumber.js"
 import { Transaction, TransactionState } from "@/lib/types"
@@ -17,7 +16,6 @@ import TransactionHistory from "./transaction-history"
 interface WalletDetailsProps {
   encryptedMnemonic: string
   mnemonic: string
-//   onWalletGenerated: (walletInfo: WalletInfo) => void
 }
 
 
@@ -25,8 +23,6 @@ interface WalletDetailsProps {
 export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [transferResult, setTransferResult] = useState<any>(null)
   const [transactionState, setTransactionState] = useState<TransactionState>({
     data: [],
     isLoading: true,
@@ -184,8 +180,6 @@ export default function WalletDetails({ mnemonic }: WalletDetailsProps) {
         ...prev,
         data: [newTransaction, ...prev.data],
       }))
-
-      setTransferResult(result)
       return result
     } catch (error) {
       console.error("Transfer error:", error)
